@@ -339,7 +339,9 @@ class eventfulEventRequester {
 
 class EventRenderer{
     constructor(changeStateCallback){
-       this.setStateCallback=changeStateCallback;
+        this.setStateCallback=changeStateCallback;
+
+        this.maxNumOfCharsPerEventTitle = 40;
 
     }
     turnDataIntoDomElements(arrayOfInfo){
@@ -369,9 +371,11 @@ class EventRenderer{
             },
         });
 
+        let shortHandTitle = this.formatEventName(infoToParse.title)
+
         let nameEl = $("<div>",{
             'class':'eventName eventContent row col-xs-8 col-md-12',
-            text: infoToParse.title,
+            text: shortHandTitle,
         });
 
         let infoTime = infoToParse.startTime.slice(11,16);
@@ -461,6 +465,26 @@ class EventRenderer{
         }
 
         return `${hour}:${min} ${meridiem}`
+    }
+    formatEventName(name){
+        //cut off title at closest space, add ... to indicate more info
+
+        if(name.length > this.maxNumOfCharsPerEventTitle) {
+            let lastSpaceIndex = 0;
+            //find last space in string
+            for (let charIndex in name.slice(0, this.maxNumOfCharsPerEventTitle)) {
+                if (name[charIndex] === ' ') {
+                    lastSpaceIndex = charIndex;
+                }
+            }
+
+            let newName = name.slice(0, lastSpaceIndex) + '...';
+
+            return newName;
+        }else{
+            return name
+        }
+
     }
 }
 
