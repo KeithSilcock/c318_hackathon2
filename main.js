@@ -395,7 +395,7 @@ class EventRenderer{
         //closure to get added data
         (function (eventRendererObj) {
             eventContainer.on({
-                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse)
+                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse, outerContainer)
             })
         })(this);
 
@@ -429,31 +429,41 @@ class EventRenderer{
         $(".eventsContainer").append(domElement);
     }
 
-    openEventPageInformation(thisObj, info, event){
-        // set state to page 3
-        thisObj.setStateCallback(3);
+    openEventPageInformation(thisObj, info,domElementToAttachCircle, event){
+        // add circle animation
+        let circleGif = $("<img>",{
+            'class': 'circleGif',
+            'src': 'includes/images/noRepeatCircleSmall.gif'+"?a="+Math.random(),
+        });
+        domElementToAttachCircle.append(circleGif);
 
-        let eventCoordinates = {
-            latitude:info.latitude,
-            longitude:info.longitude,
-        };
+        //after animation, pull event data
+        setTimeout(function () {
+            // set state to page 3
+            thisObj.setStateCallback(3);
 
-        var yelpData = new YelpDataGetter(eventCoordinates,info);
+            let eventCoordinates = {
+                latitude:info.latitude,
+                longitude:info.longitude,
+            };
 
-        // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
+            var yelpData = new YelpDataGetter(eventCoordinates,info);
 
-        let image =  $("#imageArea").attr('src', info.imageLargeUrl);
-        let street= $("#eventStreet").text(info.venue_address);
-        let city= $("#eventCity").text(info.cityName);
-        let state= $("#eventState").text(info.venueState);
-        let zip= $("#eventZip").text(info.venueZip);
-        let date= $("#eventDate").text(info.date);
-        let time= $("#eventTime").text(info.eventTime);
+            // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
 
-        let eventDetails = thisObj.formatInformation(info.description)
-        let infoDetails= $("#eventDetail").html(eventDetails);
+            let image =  $("#imageArea").attr('src', info.imageLargeUrl);
+            let street= $("#eventStreet").text(info.venue_address);
+            let city= $("#eventCity").text(info.cityName);
+            let state= $("#eventState").text(info.venueState);
+            let zip= $("#eventZip").text(info.venueZip);
+            let date= $("#eventDate").text(info.date);
+            let time= $("#eventTime").text(info.eventTime);
 
-        console.log(info)
+            let eventDetails = thisObj.formatInformation(info.description)
+            let infoDetails= $("#eventDetail").html(eventDetails);
+
+            console.log(info)
+        }, 1000)
     }
     formatTime(time){
         let meridiem = 'AM';
