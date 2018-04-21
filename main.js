@@ -56,11 +56,15 @@ class CircleController {
         $('.page1').removeClass('pageHidden');
         $('.page2').addClass('pageHidden');
         $('.page3').addClass('pageHidden');
+
+        this.clearMapData();
     }
     pageState2() {
         $('.page1').addClass('pageHidden');
         $('.page2').removeClass('pageHidden');
         $('.page3').addClass('pageHidden');
+
+        this.clearMapData();
     }
     pageState3() {
         $('.page1').addClass('pageHidden');
