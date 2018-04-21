@@ -1,5 +1,6 @@
 $(window).on('load', function () {
     let controller = new CircleController();
+    // controller.start();
 });
 
 
@@ -394,7 +395,7 @@ class EventRenderer{
         //closure to get added data
         (function (eventRendererObj) {
             eventContainer.on({
-                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse),
+                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse)
             })
         })(this);
 
@@ -448,7 +449,9 @@ class EventRenderer{
         let zip= $("#eventZip").text(info.venueZip);
         let date= $("#eventDate").text(info.date);
         let time= $("#eventTime").text(info.eventTime);
-        let infoDetails= $("#eventDetail").text(info.description);
+
+        let eventDetails = thisObj.formatInformation(info.description)
+        let infoDetails= $("#eventDetail").html(eventDetails);
 
         console.log(info)
     }
@@ -469,7 +472,6 @@ class EventRenderer{
     }
     formatEventName(name){
         //cut off title at closest space, add ... to indicate more info
-
         if(name.length > this.maxNumOfCharsPerEventTitle) {
             let lastSpaceIndex = 0;
             //find last space in string
@@ -486,6 +488,20 @@ class EventRenderer{
             return name
         }
 
+    }
+    formatInformation(info){
+        //check if they have HTML tags
+        if(info.indexOf('<')) {
+            let eventInfo = $('<div>').html(info);
+            let mainInnerText = eventInfo[0].innerText;
+            for (let childrenHTMLIndex = 0; childrenHTMLIndex < eventInfo[0].children.length; childrenHTMLIndex++) {
+                mainInnerText += " " + eventInfo[0].children[childrenHTMLIndex].innerText;
+            }
+
+            return mainInnerText;
+        }else{
+            return info
+        }
     }
 }
 
