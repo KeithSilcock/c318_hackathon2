@@ -5,18 +5,12 @@ $(window).on('load', function () {
 
 class CircleController {
     constructor() {
-        // this.newYelpCall = new YelpData({latitude: 50.0522, longitude: -60.2437},searchObjDefault);
-        // this.googleMap = new GoogleMap();
-
         this.newEventfulRequest = new eventfulEventRequester();
         this.newEventRenderer = new EventRenderer(this.setPageState.bind(this));
 
-        this.eventArray = [];
+        this.eventsArray = [];
 
         this.autoCompleteTimeout = null;
-        this.arrayOfEventCategories = ['music', 'comedy', 'family_fun_kids', 'festivals', 'film', 'food', 'food &amp; Wine', 'art',
-            'holiday', 'museums', 'business', 'nightlife', 'clubs', 'outdoors', 'animals', 'sales', 'science', 'sports', 'technology',
-            'other'];
         this.categoryKeys = {
             'Music': 'music',
             'Comedy': 'comedy',
@@ -42,6 +36,7 @@ class CircleController {
         this.setPageState(1);
 
         this.handleEventHandlers();
+
         //removes the class placed on certain DOM elements to keep them from populating
         //before page is ready. Only for cleaner look.
         this.removeInitialHideClass();
@@ -61,13 +56,11 @@ class CircleController {
         $('.page2').addClass('pageHidden');
         $('.page3').addClass('pageHidden');
     }
-
     pageState2() {
         $('.page1').addClass('pageHidden');
         $('.page2').removeClass('pageHidden');
         $('.page3').addClass('pageHidden');
     }
-
     pageState3() {
         $('.page1').addClass('pageHidden');
         $('.page2').addClass('pageHidden');
@@ -79,9 +72,9 @@ class CircleController {
     }
 
     renderEventDataOnSuccess(dataArray) {
-        this.eventArray = dataArray;
+        this.eventsArray = dataArray;
 
-        this.newEventRenderer.turnDataIntoDomElements(this.eventArray);
+        this.newEventRenderer.turnDataIntoDomElements(this.eventsArray);
     }
 
     handleEventHandlers() {
@@ -89,7 +82,7 @@ class CircleController {
             'keyup': this.onKeyUp.bind(this),
 
             'focusout': this.onFocusOutCloseAutoComplete.bind(this),
-            'focus': () => this.autocompleteAllChoices()
+            'focus': this.autoCompleteAllChoices.bind(this),
 
         });
 
@@ -207,7 +200,7 @@ class CircleController {
         $("#autoComplete").remove();
     }
 
-    autocompleteAllChoices(event) {
+    autoCompleteAllChoices(event) {
         this.removeAutoCompleteUL();
         let appendParent = $(event.target).closest('.input-group')
 
@@ -237,7 +230,7 @@ class CircleController {
 
 class eventfulEventRequester {
     constructor() {
-        this.searchObject = {
+        this.apiDataObject = {
             access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
             term: "restaurants",
             location : "Los Angeles",
@@ -254,7 +247,7 @@ class eventfulEventRequester {
         return date
     }
 
-    eventfulEventRequest(renderCallback, date='2018042000', numOfEntries=20, category='music'){
+    eventfulEventRequest(renderOnPageCallback, date='2018042000', numOfEntries=20, category='music'){
         let eventSearchResultArray = [];
         let eventSearchResultObject = {};
 
@@ -270,9 +263,10 @@ class eventfulEventRequester {
             dataType: 'jsonp',
             data: {},
             success: function (rawData) {
-                console.log("eventful" , rawData)
+                console.log("eventful" , rawData);
 
-                for (var event = 0; event < rawData.events.event.length; event++) {
+                for (let event = 0; event < rawData.events.event.length; event++) {
+
                     if (rawData.events.event[event].title !== null) {
                         var title = rawData.events.event[event].title;
                     }
@@ -328,32 +322,11 @@ class eventfulEventRequester {
                         venueState:venueState,
                     };
 
-                    eventCoordinates = {
-                        latitude: Number(eventSearchResultObject.latitude),
-                        longitude: Number(eventSearchResultObject.longitude),
-                    };
-
-                    var searchObject = {
-                        access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
-                        term: "restaurants",
-                        location : "Los Angeles",
-                        radius : 10,
-                        categories: "American (New)",
-                        priceRange : "1,2,3,4",
-                        open_now: false,
-                        sort_by: "best_match"
-                    };
-
-                    searchObject.latitude = Number(venueLatitude);
-                    searchObject.longitude = Number(venueLongitude);
-
                     eventSearchResultArray.push(eventSearchResultObject);
                 }
                 console.log("eventSearchResultArray: ", eventSearchResultArray);
 
-                renderCallback(eventSearchResultArray);
-
-
+                renderOnPageCallback(eventSearchResultArray);
             },
             error: function (error) {
                 ////console.log(error)
@@ -366,42 +339,26 @@ class eventfulEventRequester {
 
 class EventRenderer{
     constructor(changeStateCallback){
-        // this.arrayOfData = arrayOfData;
-        this.arrayOfEventCategories = ['music','comedy','family_fun_kids','festivals','film','food', 'food &amp; Wine','art',
-            'holiday','museums','business','nightlife','clubs','outdoors','animals','sales','science','sports','technology',
-            'other'];
+       this.setStateCallback=changeStateCallback;
 
-        this.changeStateCallback=changeStateCallback;
-        this.renderDropDownMenu(this.arrayOfEventCategories);
-        // this.turnDataIntoDomElements(this.arrayOfData)
     }
-//dropDownMenu begin;
-    renderDropDownMenu(arrayOfEventCats){
-        let dropDownMenuUL=$(".dropDownUL");
-
-        arrayOfEventCats.forEach(function (liName) {
-            let thisLI= $("<li>",{
-                'class': `dropDownLI dropDown${liName}`,
-                text: liName
-            });
-            dropDownMenuUL.append(thisLI)
-        })
-    }
-//dropDownMenu end;
     turnDataIntoDomElements(arrayOfInfo){
         for(let objectIndex=0; objectIndex<arrayOfInfo.length; objectIndex++){
             let infoObject = arrayOfInfo[objectIndex];
 
-            let domElement = this.parseData(infoObject);
-            this.renderOnScreen(domElement);
+            let domElement = this.createEventDoms(infoObject);
+            this.renderOnEventsScreen(domElement);
         }
 
     }
-
-    parseData(infoToParse, odd){
+    createEventDoms(infoToParse, odd){
         let outerContainer = $("<div>",{
             'class': 'outerEventContainer col-xs-12 col-md-3'
         });
+
+        if(infoToParse.imageLargeUrl === undefined){
+            infoToParse.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
+        }
         let eventContainer = $("<div>",{
             'class':'event innerEventContainer',
             css:{
@@ -412,90 +369,69 @@ class EventRenderer{
             },
         });
 
-        if(infoToParse.imageLargeUrl === undefined){
-            infoToParse.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
-        }
-
         let nameEl = $("<div>",{
             'class':'eventName eventContent row col-xs-8 col-md-12',
             text: infoToParse.title,
         });
+
+
+        let infoDate = infoToParse.startTime.slice(8,10) +
+            infoToParse.startTime.slice(4,7) +
+            infoToParse.startTime.slice(0, 4);
 
         let dateEl = $("<div>",{
             'class':'eventDate eventContent row  col-xs-8 col-md-12',
             // text: `${infoToParse.time}, ${infoToParse.date}`,
         });
 
-        let infoDate = infoToParse.startTime.slice(8,10) +
-            infoToParse.startTime.slice(4,7) +
-            infoToParse.startTime.slice(0, 4);
-
-        // start extra information
-        let extraEl = $("<div>",{
-            'class':'eventExtra shrink',
-        });
-
-        let extraInfoText = $("<div>",{
-            'class':'eventExtraInfo',
-            text: `${infoToParse.description}`,
-
-        });
-        // let addButton = $("<button>", {
-        //     'type':'button',
-        //     'class': 'addEventButton col-xs-offset-4 col-xs-4',
-        //     'text':'add to list',
-        // });
 
         //closure to get added data
-        (function (that) {
+        (function (eventRendererObj) {
             eventContainer.on({
-                'click':that.openThirdPageInformation.bind(this, that, infoToParse),
+                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse),
             })
         })(this);
 
-        // extraEl.append(extraInfoText, addButton);
-
-        // let arrayOfElements = [pictureEl, nameEl, dateEl, locationEl];
-
-        // this.bootstrapClassAdder(arrayOfElements);
-
         eventContainer.append(nameEl, dateEl);
-        outerContainer.append(eventContainer)
+        outerContainer.append(eventContainer);
 
-        $(".eventsContainer").append(outerContainer);
+        return outerContainer;
+    }
+    // handlePopOutAnimation(eventOfClick){
+    //     let parent = $(eventOfClick.target).closest('.event');
+    //     let extraInfoDiv = parent.find('.eventExtra');
+    //
+    //     this.shrinkAnyExpandedDivs(extraInfoDiv);
+    //     this.popOutAnimation(extraInfoDiv);
+    // }
+    // shrinkAnyExpandedDivs(divToSkip){
+    //     let expandedDivs=$(".expand");
+    //     for(let divIndex = 0; divIndex < expandedDivs.length; divIndex++){
+    //         if(expandedDivs[divIndex] !== divToSkip[0])
+    //             expandedDivs.removeClass('expand').addClass('shrink')
+    //     }
+    // }
+    // popOutAnimation(extraInfoDiv){
+    //     if(extraInfoDiv.hasClass('expand')) {
+    //         extraInfoDiv.removeClass('expand').addClass('shrink');
+    //     }else{
+    //         extraInfoDiv.removeClass('shrink').addClass('expand');
+    //     }
+    // }
+    renderOnEventsScreen(domElement){
+        $(".eventsContainer").append(domElement);
     }
 
-    handlePopOutAnimation(eventOfClick){
-        let parent = $(eventOfClick.target).closest('.event');
-        let extraInfoDiv = parent.find('.eventExtra');
+    openEventPageInformation(thisObj, info, event){
+        // set state to page 3
+        thisObj.setStateCallback(3);
 
-        this.shrinkAnyExpandedDivs(extraInfoDiv);
-        this.popOutAnimation(extraInfoDiv);
-    }
-
-    shrinkAnyExpandedDivs(divToSkip){
-        let expandedDivs=$(".expand");
-        for(let divIndex = 0; divIndex < expandedDivs.length; divIndex++){
-            if(expandedDivs[divIndex] !== divToSkip[0])
-                expandedDivs.removeClass('expand').addClass('shrink')
-        }
-    }
-    popOutAnimation(extraInfoDiv){
-        if(extraInfoDiv.hasClass('expand')) {
-            extraInfoDiv.removeClass('expand').addClass('shrink');
-        }else{
-            extraInfoDiv.removeClass('shrink').addClass('expand');
-        }
-    }
-    openThirdPageInformation(thisObj, info, event){
         let eventCoordinates = {
             latitude:info.latitude,
             longitude:info.longitude,
-        }
-        var yelpData = new YelpData(eventCoordinates,info);
-        // thisObj.handlePopOutAnimation(event);
-        // ^^^ keeps expanded list from closing, but need to fix in later edition
+        };
 
+        var yelpData = new YelpDataGetter(eventCoordinates,info);
 
         let infoTime = info.startTime.slice(11,17);
         let infoDate = info.startTime.slice(8,10) +
@@ -504,8 +440,6 @@ class EventRenderer{
 
         // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
 
-
-        thisObj.changeStateCallback(3);
         let image =  $("#imageArea").attr('src', info.imageLargeUrl);
         let street= $("#eventStreet").text(info.venue_address);
         let city= $("#eventCity").text(info.cityName);
@@ -515,29 +449,13 @@ class EventRenderer{
         let time= $("#eventTime").text(infoTime);
         let infoDetails= $("#eventDetail").text(info.description);
 
-
         console.log(info)
-
-
-        //collect data from event clicked
-
-    }
-
-    bootstrapClassAdder(arrayOfElements){
-        arrayOfElements.forEach(function (item) {
-            item.addClass('col-xs-3')
-        })
-    }
-
-    renderOnScreen(domElement){
-
     }
 }
 
-var yelpBusinessResultsArray=[]
-class YelpData {
+class YelpDataGetter {
     constructor(eventCoord) {
-        this.searchObject = {
+        this.apiDataObject = {
             access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
             term: "restaurants",
             // location : "Los Angeles",
@@ -547,16 +465,13 @@ class YelpData {
             open_now: false,
             sort_by: "best_match",
             'Access-Control-Allow-Origin':true,
+            latitude: Number(eventCoord.latitude),
+            longitude: Number(eventCoord.longitude),
         };
-        this.testData = null;
-        this.eventCoord = eventCoord;
-        this.searchObject.latitude = Number(this.eventCoord.latitude);
-        this.searchObject.longitude = Number(this.eventCoord.longitude);
-        this.pullBusinessData = this.pullBusinessData.bind(this);
-        this.ajaxCall = this.ajaxCall.bind(this);
-        this.ajaxCall();
-        // this.yelpBusinessResultsArray = [];
+
         this.handleEventHandler();
+
+        this.ajaxCall();
     }
 
     handleEventHandler(){
@@ -568,41 +483,49 @@ class YelpData {
             dataType: "JSON",
             method: 'POST',
             url: "http://yelp.ongandy.com/businesses",
-            data: this.searchObject,
-            success: this.pullBusinessData,
+            data: this.apiDataObject,
+            success: this.successPullBusinessData.bind(this),
             error: function (errors) {
                 ////console.log("errors : ", errors);
             }
         };
         $.ajax(yelpAjaxCall);
     }
-    pullBusinessData(data) {
+    successPullBusinessData(data) {
 
-        ////console.log(data);
-
-        // let newGoogleMap = new GoogleMap()
-
-        // this.testData = data.businesses;
-        yelpBusinessResultsArray = [];
-        this.searchObject.latitude = Number(this.eventCoord.latitude);
-        this.searchObject.longitude = Number(this.eventCoord.longitude);
-
-        // this.submitYelpButtonClicked(this.eventCoord, this.searchObject);
+        let yelpBusinessResultsArray = [];
 
         if(data.businesses) {
-            for (var businessIndex = 0; businessIndex < data.businesses.length; businessIndex++) {
+            for (let businessIndex = 0; businessIndex < data.businesses.length; businessIndex++) {
                 yelpBusinessResultsArray.push(data.businesses[businessIndex]);
             }
 
-            var {latitude, longitude} = data.region.center;
             console.log(yelpBusinessResultsArray);
-            var newMap = initMap(Number(this.eventCoord.latitude), Number(this.eventCoord.longitude), yelpBusinessResultsArray);
+            let newMap = this.initMap(this.apiDataObject.latitude, this.apiDataObject.longitude, yelpBusinessResultsArray);
 
-            // let newGoogleMap = new GoogleMap(yelpBusinessResultsArray);
-
-            // newGoogleMap.initMap(this.eventCoord.latitude, this.eventCoord.longitude);
-            // newGoogleMap.initMap(34.0522, -118.2437);
         }
+    }
+
+    initMap(lat,lng, yelpBusinessResultsArray) {
+        console.log(yelpBusinessResultsArray[0].coordinates.latitude)
+        let mapOptions = {
+            zoom: 16,
+            center: new google.maps.LatLng(lat,lng)
+        };
+        let map = new google.maps.Map(document.getElementById('google-map'), mapOptions);
+
+        let markerLat;
+        let markerLng;
+        for (let markerIndex=0; markerIndex<yelpBusinessResultsArray.length; markerIndex++) {
+            markerLat = yelpBusinessResultsArray[markerIndex].coordinates.latitude;
+            markerLng = yelpBusinessResultsArray[markerIndex].coordinates.longitude;
+            var marker = new google.maps.Marker({
+                map: map,
+                position: new google.maps.LatLng(markerLat, markerLng),
+                animation: google.maps.Animation.DROP,
+            });
+        }
+        return map
     }
 
     submitYelpButtonClicked(eventLocation, searchObjectParameters) {
@@ -610,76 +533,28 @@ class YelpData {
         //     access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx"
         // };
         var milesToMeters = 1609.34/1; //1609.34m per 1 mile
-        searchObjectParameters.term = $("#term").val() || this.searchObject.term;
-        searchObjectParameters.latitude = eventLocation.latitude || this.searchObject.latitude;
-        searchObjectParameters.longitude = eventLocation.longitude || this.searchObject.longitude;
-        searchObjectParameters.location = $(/*#location*/).val() || this.searchObject.location;
-        searchObjectParameters.radius = parseInt($("#radius").val())*milesToMeters || this.searchObject.radius;
-        searchObjectParameters.categories = $(/*#categories*/).val() || this.searchObject.categories;
-        searchObjectParameters.priceRange = $(/*"#priceRange"*/).val() || this.searchObject.price;
-        searchObjectParameters.open_now = $(/*#open_now*/).val() || this.searchObject.open_now;
-        searchObjectParameters.sort_by = $(/*#sort_by*/).val() || this.searchObject.sort_by;
+        searchObjectParameters.term = $("#term").val() || this.apiDataObject.term;
+        searchObjectParameters.latitude = eventLocation.latitude || this.apiDataObject.latitude;
+        searchObjectParameters.longitude = eventLocation.longitude || this.apiDataObject.longitude;
+        searchObjectParameters.location = $(/*#location*/).val() || this.apiDataObject.location;
+        searchObjectParameters.radius = parseInt($("#radius").val())*milesToMeters || this.apiDataObject.radius;
+        searchObjectParameters.categories = $(/*#categories*/).val() || this.apiDataObject.categories;
+        searchObjectParameters.priceRange = $(/*"#priceRange"*/).val() || this.apiDataObject.price;
+        searchObjectParameters.open_now = $(/*#open_now*/).val() || this.apiDataObject.open_now;
+        searchObjectParameters.sort_by = $(/*#sort_by*/).val() || this.apiDataObject.sort_by;
 
 
         return searchObjectParameters;
-        // var newYelpCall = new YelpData(eventLocation, searchObjectParameters);
+        // var newYelpCall = new YelpDataGetter(eventLocation, searchObjectParameters);
         // console.log(newYelpCall);
         // var map = new CreateGoogleMap(newYelpCall.yelpBusinessResultsArray);
 
     }
 }
 
-function initMap(lat,lng, yelpBusinessResultsArray) {
-    console.log(yelpBusinessResultsArray[0].coordinates.latitude)
-    var mapOptions = {
-        zoom: 16,
-        center: new google.maps.LatLng(lat,lng)
-    }
-    var map = new google.maps.Map(document.getElementById('google-map'), mapOptions);
-    var markerLocation = {lat: 34.0522, lng: -118.2437};
-    var markerLat;
-    var markerLng;
-    for (let markerIndex=0; markerIndex<yelpBusinessResultsArray.length; markerIndex++) {
-        markerLat = yelpBusinessResultsArray[markerIndex].coordinates.latitude;
-        markerLng = yelpBusinessResultsArray[markerIndex].coordinates.longitude;
-        var marker = new google.maps.Marker({
-            map: map,
-            position: new google.maps.LatLng(markerLat, markerLng),
-            animation: google.maps.Animation.DROP,
-        });
-    }
-    return map
-}
-
-var eventCoordinates={}
-//function eventfulEventRequest(startDate, endDate, category){
-
-
 /**
  * Global variables
  */
-
-
-// var eventSearchResultArray = [];
-// var yelpArrayLength = [];
-// var markersArray = [];
-
-// $(document).ready(initializeApp);
-
-// variables to pull data from DOM
-// const searchObjDefault = {
-//     access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
-//     term: "restaurants",
-//     latitude: 34.0522, // current number is for LA  /*DOM element search item - a number, can have decimals*/,
-//     longitude: -118.2437, // current number is for LA   /*DOM element search item - a number, can have decimals*/,
-//     location : "Los Angeles",
-//     radius : 800,
-//     categories: "American (New)",
-//     priceRange : "1,2,3,4",
-//     open_now: false,
-//     sort_by: "best_match"
-// };
-// const yelpBusinessResultsArray = [];
 
 
 
@@ -774,7 +649,7 @@ var eventCoordinates={}
 //     open_now: false,
 //     sort_by: "best_match"
 // }
-// var newYelpCall = new YelpData({latitude: 47.6062, longitude: -122.3321}, testSearchObject);
+// var newYelpCall = new YelpDataGetter({latitude: 47.6062, longitude: -122.3321}, testSearchObject);
 // console.log(testData);
 
 
@@ -853,7 +728,7 @@ var eventCoordinates={}
 //
 //
 //     return searchObjectParameters;
-//     // var newYelpCall = new YelpData(eventLocation, searchObjectParameters);
+//     // var newYelpCall = new YelpDataGetter(eventLocation, searchObjectParameters);
 //     // console.log(newYelpCall);
 //     // var map = new CreateGoogleMap(newYelpCall.yelpBusinessResultsArray);
 //
@@ -863,7 +738,7 @@ var eventCoordinates={}
 /***************************************************************************************************
  * createGoogleMap
  * @params {undefined}
- * @returns: {object} searchObject that contains properties that contain an address or coordinates to center map
+ * @returns: {object} apiDataObject that contains properties that contain an address or coordinates to center map
  * creates a map to display onto page that will contain makers. Markers will be yelp results
  */
 
