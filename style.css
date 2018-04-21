@@ -154,6 +154,7 @@ button{
     cursor: pointer;
     padding:4%;
     height:95%;
+    background-size: auto;
 }
 .eventContent{
     text-align: center;
@@ -285,6 +286,7 @@ button{
     position: absolute;
     top:-20%;
     width: 100%;
+    height:120%;
 
     z-index: 100;
     /*height:100%;*/
