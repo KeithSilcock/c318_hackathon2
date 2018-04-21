@@ -96,6 +96,7 @@ class CircleController {
         $('.closePage3').on({
             'click': () => {
                 this.setPageState(2);
+                this.clearMapData();
             }
         });
 
@@ -126,6 +127,10 @@ class CircleController {
         this.requestEventData(date, 20, category);
     }
 
+    clearMapData(){
+        $('.gm-style').remove();
+    }
+
     onKeyUp(event) {
         if (event.key === 'Escape') {
             this.removeAutoCompleteUL();
@@ -136,7 +141,6 @@ class CircleController {
             this.autoCompleteTimeout = setTimeout(this.autoCompleteCourse.bind(this, event.target), 500);
         }
     }
-
     onFocusOutCloseAutoComplete(event) {
         if (!this.focusOutTimeout) {
             this.focusOutTimeout = setTimeout(this.removeAutoCompleteUL, 200);
@@ -145,7 +149,6 @@ class CircleController {
             this.focusOutTimeout = setTimeout(this.removeAutoCompleteUL, 200);
         }
     }
-
     autoCompleteCourse(inputToComplete) {
         this.removeAutoCompleteUL();
 
@@ -195,11 +198,9 @@ class CircleController {
             this.removeAutoCompleteUL();
         }
     }
-
     removeAutoCompleteUL(event) {
         $("#autoComplete").remove();
     }
-
     autoCompleteAllChoices(event) {
         this.removeAutoCompleteUL();
         let appendParent = $(event.target).closest('.input-group')
