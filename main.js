@@ -596,7 +596,7 @@ class YelpData {
 
             var {latitude, longitude} = data.region.center;
             console.log(yelpBusinessResultsArray);
-            // var newMap = initMap(Number(this.eventCoord.latitude), Number(this.eventCoord.longitude), yelpBusinessResultsArray);
+            var newMap = initMap(Number(this.eventCoord.latitude), Number(this.eventCoord.longitude), yelpBusinessResultsArray);
 
             // let newGoogleMap = new GoogleMap(yelpBusinessResultsArray);
 
