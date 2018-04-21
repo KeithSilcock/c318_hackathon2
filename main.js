@@ -374,14 +374,15 @@ class EventRenderer{
             text: infoToParse.title,
         });
 
+        let infoTime = infoToParse.startTime.slice(11,16);
 
-        let infoDate = infoToParse.startTime.slice(8,10) +
-            infoToParse.startTime.slice(4,7) +
-            infoToParse.startTime.slice(0, 4);
+        infoToParse.eventTime = this.formatTime(infoTime);
+
+        infoToParse.date = `${infoToParse.startTime.slice(5,7)}-${infoToParse.startTime.slice(8,10)}-${infoToParse.startTime.slice(0, 4)}`;
 
         let dateEl = $("<div>",{
             'class':'eventDate eventContent row  col-xs-8 col-md-12',
-            // text: `${infoToParse.time}, ${infoToParse.date}`,
+            text: `${infoToParse.eventTime}`,
         });
 
 
@@ -433,11 +434,6 @@ class EventRenderer{
 
         var yelpData = new YelpDataGetter(eventCoordinates,info);
 
-        let infoTime = info.startTime.slice(11,17);
-        let infoDate = info.startTime.slice(8,10) +
-            info.startTime.slice(4,7) +
-            info.startTime.slice(0, 4);
-
         // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
 
         let image =  $("#imageArea").attr('src', info.imageLargeUrl);
@@ -445,11 +441,26 @@ class EventRenderer{
         let city= $("#eventCity").text(info.cityName);
         let state= $("#eventState").text(info.venueState);
         let zip= $("#eventZip").text(info.venueZip);
-        let date= $("#eventDate").text(infoDate);
-        let time= $("#eventTime").text(infoTime);
+        let date= $("#eventDate").text(info.date);
+        let time= $("#eventTime").text(info.eventTime);
         let infoDetails= $("#eventDetail").text(info.description);
 
         console.log(info)
+    }
+    formatTime(time){
+        let meridiem = 'AM';
+        let hour = time.slice(0,2);
+        let min = time.slice(3,5);
+
+        if(hour === 0){
+            hour = 12;
+        }
+        if(hour > 12){
+            hour = hour-12;
+            meridiem = 'PM';
+        }
+
+        return `${hour}:${min} ${meridiem}`
     }
 }
 
