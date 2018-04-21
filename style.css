@@ -73,7 +73,6 @@ header:hover{
     height: 100%;
     position: relative;
     clear: both;
-
 }
 
 /*first page*/
@@ -280,4 +279,13 @@ button{
 }
 .initialHide{
     display: none;
+}
+.circleGif{
+    /*display: none;*/
+    position: absolute;
+    top:-20%;
+    width: 100%;
+
+    z-index: 100;
+    /*height:100%;*/
 }
