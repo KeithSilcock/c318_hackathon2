@@ -1,5 +1,3 @@
-//Katy this is the correct one to work on!
-
 $(window).on('load', function () {
     let controller = new CircleController();
     // controller.start();
@@ -361,47 +359,47 @@ class EventRenderer{
         }
 
     }
-    createEventDoms(infoToParse, odd){
+    createEventDoms(dataFromEventAPI){
         let outerContainer = $("<div>",{
             'class': 'outerEventContainer col-xs-12 col-md-3'
         });
 
-        if(infoToParse.imageLargeUrl === undefined){
-            infoToParse.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
+        if(dataFromEventAPI.imageLargeUrl === undefined){
+            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
         }
         let eventContainer = $("<div>",{
             'class':'event innerEventContainer',
             css:{
-                'background-image': `url("${infoToParse.imageLargeUrl}")`
+                'background-image': `url("${dataFromEventAPI.imageLargeUrl}")`
             },
             on:{
                 // 'click': this.handlePopOutAnimation.bind(this),
             },
         });
 
-        let shortHandTitle = this.formatEventName(infoToParse.title)
+        let shortHandTitle = this.formatEventName(dataFromEventAPI.title)
 
         let nameEl = $("<div>",{
             'class':'eventName eventContent row col-xs-8 col-md-12',
             text: shortHandTitle,
         });
 
-        let infoTime = infoToParse.startTime.slice(11,16);
+        let infoTime = dataFromEventAPI.startTime.slice(11,16);
 
-        infoToParse.eventTime = this.formatTime(infoTime);
+        dataFromEventAPI.eventTime = this.formatTime(infoTime);
 
-        infoToParse.date = `${infoToParse.startTime.slice(5,7)}-${infoToParse.startTime.slice(8,10)}-${infoToParse.startTime.slice(0, 4)}`;
+        dataFromEventAPI.date = `${dataFromEventAPI.startTime.slice(5,7)}-${dataFromEventAPI.startTime.slice(8,10)}-${dataFromEventAPI.startTime.slice(0, 4)}`;
 
         let dateEl = $("<div>",{
             'class':'eventDate eventContent row  col-xs-8 col-md-12',
-            text: `${infoToParse.eventTime}`,
+            text: `${dataFromEventAPI.eventTime}`,
         });
 
 
         //closure to get added data
         (function (eventRendererObj) {
             eventContainer.on({
-                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse, outerContainer)
+                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, dataFromEventAPI, outerContainer)
             })
         })(this);
 
@@ -574,6 +572,7 @@ class YelpDataGetter {
         }
     }
 
+    //Katy here's your work for today! GET TO WORK!
     initMap(lat,lng, yelpBusinessResultsArray) {
         console.log(yelpBusinessResultsArray[0].coordinates.latitude)
         let mapOptions = {
