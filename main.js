@@ -1,3 +1,5 @@
+//Katy this is the correct one to work on!
+
 $(window).on('load', function () {
     let controller = new CircleController();
     // controller.start();
