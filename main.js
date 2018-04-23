@@ -518,59 +518,6 @@ class EventRenderer{
         }
     }
 
-    yelpDatatoDomElements() {
-
-    }
-
-    createYelpDOMElements(yelpBusinessArray) {
-        let yelpDataContainer = $("<div>",{
-            'class': 'yelpDataContainer'
-        });
-
-        if(dataFromEventAPI.imageLargeUrl === undefined){
-            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
-        }
-        let eventContainer = $("<div>",{
-            'class':'event innerEventContainer',
-            css:{
-                'background-image': `url("${dataFromEventAPI.imageLargeUrl}")`
-            },
-            on:{
-                // 'click': this.handlePopOutAnimation.bind(this),
-            },
-        });
-
-        let shortHandTitle = this.formatEventName(dataFromEventAPI.title)
-
-        let nameEl = $("<div>",{
-            'class':'eventName eventContent row col-xs-8 col-md-12',
-            text: shortHandTitle,
-        });
-
-        let infoTime = dataFromEventAPI.startTime.slice(11,16);
-
-        dataFromEventAPI.eventTime = this.formatTime(infoTime);
-
-        dataFromEventAPI.date = `${dataFromEventAPI.startTime.slice(5,7)}-${dataFromEventAPI.startTime.slice(8,10)}-${dataFromEventAPI.startTime.slice(0, 4)}`;
-
-        let dateEl = $("<div>",{
-            'class':'eventDate eventContent row  col-xs-8 col-md-12',
-            text: `${dataFromEventAPI.eventTime}`,
-        });
-
-
-        //closure to get added data
-        (function (eventRendererObj) {
-            eventContainer.on({
-                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, dataFromEventAPI, outerContainer)
-            })
-        })(this);
-
-        eventContainer.append(nameEl, dateEl);
-        outerContainer.append(eventContainer);
-
-        return outerContainer;
-    }
 }
 
 class YelpDataGetter {
@@ -625,11 +572,13 @@ class YelpDataGetter {
 
         }
 
+        this.yelpDatatoDomElements(yelpBusinessResultsArray);
+
     }
 
     //Katy here's your work for today! GET TO WORK!
     initMap(lat,lng, yelpBusinessResultsArray) {
-        console.log(yelpBusinessResultsArray[0].coordinates.latitude);
+        // console.log(yelpBusinessResultsArray[0].coordinates.latitude);
 
         this.infoWindow = new google.maps.InfoWindow();
 
@@ -731,6 +680,71 @@ class YelpDataGetter {
         // console.log(newYelpCall);
         // var map = new CreateGoogleMap(newYelpCall.yelpBusinessResultsArray);
 
+    }
+
+    yelpDatatoDomElements(yelpBusinessArray) {
+        $("#yelpBusinessList > div").remove();
+        for(let businessIndex = 0; businessIndex < yelpBusinessArray.length; businessIndex++ ){
+            let businesObj = yelpBusinessArray[businessIndex];
+            let yelpBusinessElement = this.createYelpDOMElements(businesObj);
+            this.appendDOMElements(yelpBusinessElement);
+        }
+    }
+
+    appendDOMElements(yelpBusiness) {
+        $("#yelpBusinessList").append(yelpBusiness);
+    }
+
+    createYelpDOMElements(yelpBusiness) {
+        let restaurantContainer = $("<div>",{'class':'restaurantContainer'});
+
+        let restaurantName = yelpBusiness.name;
+        let restaurantPrice = yelpBusiness.price;
+        let restaurantNameElement = $("<div>",{
+            'class':'restaurantName row',
+            text: `${restaurantName}, ${restaurantPrice}`,
+        });
+
+        function getRestaurantCategories(restaurantCategories) {
+            var categories = "";
+            for(var categoryIndex = 0; categoryIndex < restaurantCategories.length; categoryIndex++ ) {
+                categories = restaurantCategories[categoryIndex].title + ", " + categories;
+            }
+            categories = categories.slice(0, categories.lastIndexOf(","));
+            return categories;
+        }
+        let restaurantCategoriesElement = $("<div>",{
+            'class':'restaurantCategories row',
+            text: `${getRestaurantCategories(yelpBusiness.categories)}`,
+        });
+
+        function getRestaurantLocation(restaurantLocationObject) {
+            let location;
+            if(restaurantLocationObject.address2 === "") {
+                location = `${restaurantLocationObject.address1} ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
+            } else if (restaurantLocationObject.address3 === ""){
+                location = `${restaurantLocationObject.address1} ${restaurantLocationObject.address2} ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
+            } else {
+                location = `${restaurantLocationObject.address1},${restaurantLocationObject.address2},${restaurantLocationObject.address3}, ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`;
+            }
+            return location
+        }
+        let restaurantPhone = yelpBusiness.display_phone;
+        let restaurantLocationPhoneElement = $("<div>" , {
+            'class' : 'restaurantLocationPhone row',
+            text: `${getRestaurantLocation(yelpBusiness.location)}, ${restaurantPhone}`
+        });
+
+        let restaurantRating = yelpBusiness.rating;
+        let restaurantRatingCount = yelpBusiness.review_count;
+        let restaurantReviewElement = $("<div>" , {
+            'class' : 'resturantReviews row',
+            text: `${restaurantRating}, Review Count: ${restaurantRatingCount}`
+        });
+
+        restaurantContainer.append(restaurantNameElement, restaurantCategoriesElement, restaurantLocationPhoneElement, restaurantReviewElement);
+
+        return restaurantContainer;
     }
 }
 
