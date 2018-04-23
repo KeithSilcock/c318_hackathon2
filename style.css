@@ -169,7 +169,6 @@ button{
     margin-right: 5%;
     margin-bottom: 5%;
     position: relative;
-
 }
 
 .containerSize{
@@ -271,4 +270,17 @@ button{
     color: white;
     text-shadow: 1px 1px 10px black;
     
+}
+
+#eventDetail{
+    background-color: grey;
+    opacity: 0.8;
+    border: 5px double white;
+    padding:10px;
+    width: 50vw;
+    height: 30vh;
+    overflow-y:scroll;
+}
+#eventDetail::-webkit-scrollbar {
+    display: none;
 }
