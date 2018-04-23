@@ -162,7 +162,6 @@ class CircleController {
         let lettersSoFar = categoryInput.val().toLowerCase();
 
         if (lettersSoFar.length === 0) {
-            // this.removeAutoCompleteUL();
             return;
         }
 
@@ -236,20 +235,21 @@ class CircleController {
 
 class eventfulEventRequester {
     constructor() {
-        this.apiDataObject = {
-            access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
-            term: "restaurants",
-            location : "Los Angeles",
-            radius : 10,
-            categories: "American (New)",
-            priceRange : "1,2,3,4",
-            open_now: false,
-            sort_by: "best_match"
-        };
+        // this.apiDataObject = {
+        //     access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
+        //     term: "restaurants",
+        //     location : "Los Angeles",
+        //     radius : 10,
+        //     categories: "American (New)",
+        //     priceRange : "1,2,3,4",
+        //     open_now: false,
+        //     sort_by: "best_match"
+        // }
     }
 
     formatDate(date){
         date = date.replace(/-/g,'')
+        console.log(date);
         return date
     }
 
@@ -260,17 +260,16 @@ class eventfulEventRequester {
         date = this.formatDate(date);
         let dateEnd=(Number(date) + 3).toString();
 
-        let url=`https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=${date}00-${dateEnd}00&category=${category}&image_sizes=blackborder250,block100&page_size=${numOfEntries}&category=new`
-
+        let url=`https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=${date}00-${dateEnd}00&category=${category},new&image_sizes=block200,medium&page_size=${numOfEntries}&sort_order=popularity`
+        console.log(url);
         $.ajax({
             //url: "https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date="+  startDate +"00-" + endDate + "00&category=" +  category + "&image_sizes=blackborder250,block100&page_size=10&category=new",
             //"https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=2018042000-2018042000&category=music&image_sizes=blackborder250,block100&page_size=20&category=new",
             url: url,
             dataType: 'jsonp',
             data: {},
-            success: function (rawData) {
+            success: function (rawData){ 
                 console.log("eventful" , rawData);
-
                 for (let event = 0; event < rawData.events.event.length; event++) {
 
                     if (rawData.events.event[event].title !== null) {
@@ -279,9 +278,19 @@ class eventfulEventRequester {
                     if (rawData.events.event[event].city_name !== null) {
                         var cityName = rawData.events.event[event].city_name;
                     }
-                    if (rawData.events.event[event].image !== null) {
-                        var imageSmallUrl = 'http:' + rawData.events.event[event].image.block100.url;
-                        var imageLargeUrl = 'http:' + rawData.events.event[event].image.blackborder250.url;
+                    var imageUrl = rawData.events.event[event].image;
+                    if (imageUrl !== null) {
+                        // imageUrl ='';
+                        var a = rawData.events.event[event].image.medium.url;
+                        var b = rawData.events.event[event].image.block200;
+                        // console.log(b);
+                        var c = a.indexOf('http');
+                        if(c === 0 || b === undefined){
+                            imageUrl = a;
+                
+                        }else{
+                            imageUrl = 'http:'+ b.url;
+                        }                            
                     }
                     if (rawData.events.event[event].venue_address !== null) {
                         var venue_address = rawData.events.event[event].venue_address;
@@ -315,8 +324,8 @@ class eventfulEventRequester {
                     eventSearchResultObject = {
                         title: title,
                         cityName: cityName,
-                        imageSmallUrl: imageSmallUrl,
-                        imageLargeUrl: imageLargeUrl,
+                        // imageSmallUrl: imageSmallUrl,
+                        imageUrl: imageUrl,
                         venue_address: venue_address,
                         venue_name: venue_name,
                         description: description,
@@ -361,16 +370,16 @@ class EventRenderer{
     }
     createEventDoms(dataFromEventAPI){
         let outerContainer = $("<div>",{
-            'class': 'outerEventContainer col-xs-12 col-md-3'
+            'class': 'outerEventContainer col-xs-10 col-md-3'
         });
 
-        if(dataFromEventAPI.imageLargeUrl === undefined){
-            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpg'
+        if(dataFromEventAPI.imageUrl === null){
+            dataFromEventAPI.imageUrl= 'includes/images/testPartyImg.jpg'
         }
         let eventContainer = $("<div>",{
             'class':'event innerEventContainer',
             css:{
-                'background-image': `url("${dataFromEventAPI.imageLargeUrl}")`
+                'background-image': `url("${dataFromEventAPI.imageUrl}")`
             },
             on:{
                 // 'click': this.handlePopOutAnimation.bind(this),
@@ -435,13 +444,13 @@ class EventRenderer{
 
     openEventPageInformation(thisObj, info,domElementToAttachCircle, event){
         // add circle animation
-        let circleGif = $("<img>",{
-            'class': 'circleGif',
-            'src': 'includes/images/noRepeatCircleSmall.gif'+"?a="+Math.random(),
-        });
-        domElementToAttachCircle.append(circleGif);
+        // let circleGif = $("<img>",{
+        //     'class': 'circleGif',
+        //     'src': 'includes/images/noRepeatCircleSmall.gif'+"?a="+Math.random(),
+        // });
+        // domElementToAttachCircle.append(circleGif);
 
-        //after animation, pull event data
+        //show event data
         setTimeout(function () {
             // set state to page 3
             thisObj.setStateCallback(3);
@@ -453,9 +462,7 @@ class EventRenderer{
 
             var yelpData = new YelpDataGetter(eventCoordinates,info);
 
-            // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
-
-            let image =  $("#imageArea").attr('src', info.imageLargeUrl);
+            let image =  $("#imageArea").attr('src', info.imageUrl);
             let street= $("#eventStreet").text(info.venue_address);
             let city= $("#eventCity").text(info.cityName);
             let state= $("#eventState").text(info.venueState);
@@ -505,17 +512,17 @@ class EventRenderer{
     }
     formatInformation(info){
         //check if they have HTML tags
-        if(info.indexOf('<')) {
-            let eventInfo = $('<div>').html(info);
-            let mainInnerText = eventInfo[0].innerText;
-            for (let childrenHTMLIndex = 0; childrenHTMLIndex < eventInfo[0].children.length; childrenHTMLIndex++) {
-                mainInnerText += " " + eventInfo[0].children[childrenHTMLIndex].innerText;
-            }
+        // if(info.indexOf('<')) {
+        //     let eventInfo = $('<div>').html(info);
+        //     let mainInnerText = eventInfo[0].innerText;
+        //     for (let childrenHTMLIndex = 0; childrenHTMLIndex < eventInfo[0].children.length; childrenHTMLIndex++) {
+        //         mainInnerText += " " + eventInfo[0].children[childrenHTMLIndex].innerText;
+        //     }
 
-            return mainInnerText;
-        }else{
-            return info
-        }
+        //     return mainInnerText;
+        // }else{
+        //     return info
+        // }
     }
 
 }
@@ -638,7 +645,7 @@ class YelpDataGetter {
             </div>
             <div class="reviewCount">
                 <p>${restaurant.review_count}</p>
-            </div>
+             </div>
         </div>`;
 
 
@@ -715,34 +722,40 @@ class YelpDataGetter {
         }
         let restaurantCategoriesElement = $("<div>",{
             'class':'restaurantCategories row restaurantInfo',
-            text: `${getRestaurantCategories(yelpBusiness.categories)}`,
+            text: `Food categories: ${getRestaurantCategories(yelpBusiness.categories)}`,
         });
 
         function getRestaurantLocation(restaurantLocationObject) {
             let location;
             if(restaurantLocationObject.address2 === "") {
-                location = `${restaurantLocationObject.address1} ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
+                location = `Address: ${restaurantLocationObject.address1} ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
             } else if (restaurantLocationObject.address3 === ""){
-                location = `${restaurantLocationObject.address1} ${restaurantLocationObject.address2} ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
+                location = `Address: ${restaurantLocationObject.address1} ${restaurantLocationObject.address2} ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
             } else {
-                location = `${restaurantLocationObject.address1},${restaurantLocationObject.address2},${restaurantLocationObject.address3}, ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`;
+                location = `Address: ${restaurantLocationObject.address1},${restaurantLocationObject.address2},${restaurantLocationObject.address3}, ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`;
             }
             return location
         }
         let restaurantPhone = yelpBusiness.display_phone;
-        let restaurantLocationPhoneElement = $("<div>" , {
+        let restaurantLocationElement = $("<div>" , {
             'class' : 'restaurantLocationPhone row restaurantInfo',
             text: `${getRestaurantLocation(yelpBusiness.location)}, ${restaurantPhone}`
+        });
+
+        let restaurantPhoneElement = $("<div>" , {
+            'class' : 'restaurantLocationPhone row restaurantInfo',
+            text: `Phone: ${restaurantPhone}`
         });
 
         let restaurantRating = yelpBusiness.rating;
         let restaurantRatingCount = yelpBusiness.review_count;
         let restaurantReviewElement = $("<div>" , {
             'class' : 'resturantReviews row restaurantInfo',
-            text: `${restaurantRating}, Review Count: ${restaurantRatingCount}`
+            text: `Rating: ${restaurantRating}`
+                   // Review Count: ${restaurantRatingCount}`
         });
 
-        restaurantContainer.append(restaurantNameElement, restaurantCategoriesElement, restaurantLocationPhoneElement, restaurantReviewElement);
+        restaurantContainer.append(restaurantNameElement, restaurantCategoriesElement, restaurantLocationElement,restaurantPhoneElement, restaurantReviewElement);
 
         return restaurantContainer;
     }

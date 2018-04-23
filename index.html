@@ -14,7 +14,7 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <title>Happenins</title>
+    <title>Circled</title>
 </head>
 <body>
 
@@ -27,14 +27,7 @@
 
     <header id="headerArea" class="container-fluid col-sm-12 col-lg-12">
         <div id="logo"><spam id='logoSpam'>Circled</spam></div>
-
-        <!--<div class="eventsDropDownCont dropdown col-xs-offset-7 col-xs-2 col-md-offset-10 col-md-1 clearfix">-->
-        <!--<button data-toggle="dropdown" type="button" class="page2 dropdown-toggle btn btn-primary">&#8801;<span class="caret"></span></button>-->
-        <!--<ul class="dropdown-menu dropDownUL">-->
-
-        <!--</ul>-->
-        <!--</div>-->
-        <div class="page2 initialHide headerSearch input-group form-group">
+            <div class="page2 initialHide headerSearch input-group form-group">
             <span class="input-group-addon searchCategory">
                 <span class="glyphicon glyphicon-search"></span>
             </span>
@@ -92,73 +85,60 @@
             <div id="pageContainer" class="container-fluid">
                 <!-- all detail elemnt inside here  -->
 
-                <div id="eventInfoArea" class="containerSize col-lg-3 col-md-3 col-sm-10 col-xs-12">
-                    <!-- <divn id = 'mainEventContainer'> -->
+                        <div id="eventInfoArea" class="containerSize col-lg-3 col-md-3 col-sm-10 col-xs-12">
 
-                    <div>
-                        <img id="imageArea" src="includes/images/testPartyImg.jpeg">
-                    </div>
+                              <div class="eventInfoBox">
+                                    <div class="eventInfoBox">
+                                        <img id="imageArea" src="#">
+                                    </div>
 
-                    <div>
-                        <span class="glyphicon glyphicon-map-marker"></span>
-                        <span id="eventStreet">9200 Irvine Center Dr</span>
-                        <span id="eventCity">Irvine</span>
-                        <span id="eventState">CA</span>
-                        <span id="eventZip">92620</span>
-                    </div>
+                                    <div>
+                                        <span class="glyphicon glyphicon-map-marker"></span>
+                                        <span id="eventStreet"></span>
+                                        <span id="eventCity"></span>
+                                        <span id="eventState"></span>
+                                        <span id="eventZip"></span>
+                                    </div>
 
-                    <div>
-                        <span class="glyphicon glyphicon-calendar"></span>
-                        <span id="eventDate">April 18 2018</span>
-                    </div>
+                                    <div>
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                        <span id="eventDate"></span>
+                                    </div>
 
-                    <div>
-                        <span class="glyphicon glyphicon-time"></span>
-                        <span id="eventTime"> 8:30 PM</span>
-                    </div>
-                    <div id="eventDetail">
+                                    <div>
+                                        <span class="glyphicon glyphicon-time"></span>
+                                        <span id="eventTime"></span>
+                                    </div>
+                                   <!--  <div>
+                                        <span class="glyphicon glyphicon-tag"></span>
+                                        <span id="eventTicket"></span>
+                                    </div> -->
+                              </div>
+                              <div id="eventDetail" class="eventInfoBox"></div>
+                       </div>
 
-                    </div>
-                </div>
+                        <div id="mapArea" class="containerSize col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div id="google-map"></div>
+                        </div>
 
-                <div id="mapArea" class="containerSize col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <div id="google-map"></div>
-                </div>
+                        <div id="surroundingAreaInfo" class="containerSize col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <div class="input-group form-group">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-cutlery"></span>
+                                </span>
+                                <input id="yelpSearchBoxTerm" class="form-control" placeholder="Find.. (ex. American, BBQ)" type="text" >
+                            </div>
+                            <div class="input-group form-group">
+                                <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-map-marker"></span>
+                                </span>
+                                <input id="yelpSearchBoxRadius" type="text" class="form-control" name="userInputEventType" placeholder="Within..(miles)">
+                            </div>
+                            <button type="button" class="btn btn-danger btn-md" id="yelpSearchButton">Go!</button>
 
-                <div id="surroundingAreaInfo" class="containerSize col-lg-2 col-md-2 col-sm-12 col-xs-12">
-                <div class="input-group form-group">
-                <span class="input-group-addon">
-                <span class="glyphicon glyphicon-cutlery"></span>
-                </span>
-                <input id="yelpSearchBoxTerm" class="form-control" placeholder="Find.. (ex. American, BBQ)" type="text" >
-                </div>
-                <div class="input-group form-group">
-                <span class="input-group-addon">
-                <span class="glyphicon glyphicon-map-marker"></span>
-                </span>
-                <input id="yelpSearchBoxRadius" type="text" class="form-control" name="userInputEventType" placeholder="Within..(miles)">
-                </div>
+                        </div>
+                        <div id="yelpBusinessList" class="containerSize col-lg-5 col-md-5 col-sm-12 col-xs-12"></div>
 
-                <!--<div class="input-group form-group priceDropDownCont dropdown">-->
-                <!--<ul class="dropdown-menu dropDownUL">-->
-                <!--<li>$</li>-->
-                <!--<li>$$</li>-->
-                <!--<li>$$$</li>-->
-                <!--<li>$$$$</li>-->
-                <!--</ul>-->
-                <!--<span class="input-group-addon">-->
-                <!--<span class="glyphicon glyphicon-map-marker"></span>-->
-                <!--</span>-->
-                <!--<input id="yelpSearchBox priceRange" type="text" class="form-control" name="userInputEventType" placeholder="Price Range">-->
-                <!--<button data-toggle="dropdown" type="button" class="page2 dropdown-toggle btn btn-primary">&#8801;<span class="caret"></span></button>-->
-                </div>
-
-                <!--<div id="surroundingAreaInfo" class="containerSize col-lg-3 col-md-3 col-sm-12 col-xs-12"></div>-->
-
-
-                <button type="button" class="btn btn-danger btn-md" id="yelpSearchButton">Go!</button>
-                <div id="yelpBusinessList" class="col-md-5">
-                </div>
                 </div>
             </div>
         </div>
