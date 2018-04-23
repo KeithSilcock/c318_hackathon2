@@ -260,7 +260,7 @@ class eventfulEventRequester {
         date = this.formatDate(date);
         let dateEnd=(Number(date) + 3).toString();
 
-        let url=`https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=${date}00-${dateEnd}00&category=${category},new&image_sizes=block200,medium&page_size=${numOfEntries}&sort_order=popularity`
+        let url=`https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=${date}00-${dateEnd}00&category=${category}&category=new&image_sizes=block200,medium&page_size=${numOfEntries}&sort_order=popularity`
         console.log(url);
         $.ajax({
             //url: "https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date="+  startDate +"00-" + endDate + "00&category=" +  category + "&image_sizes=blackborder250,block100&page_size=10&category=new",
@@ -300,6 +300,7 @@ class eventfulEventRequester {
                     }
                     if (rawData.events.event[event].description !== null) {
                         var description = rawData.events.event[event].description;
+                        debugger
                     }
                     if (rawData.events.event[event].start_time !== null) {
                         var startTime = rawData.events.event[event].start_time;
@@ -404,7 +405,6 @@ class EventRenderer{
             text: `${dataFromEventAPI.eventTime}`,
         });
 
-
         //closure to get added data
         (function (eventRendererObj) {
             eventContainer.on({
@@ -471,7 +471,7 @@ class EventRenderer{
             let time= $("#eventTime").text(info.eventTime);
 
             let eventDetails = thisObj.formatInformation(info.description)
-            let infoDetails= $("#eventDetail").html(eventDetails);
+            let infoDetails= $("#eventDetail").text(eventDetails);
 
             console.log(info)
         }, 1000)
