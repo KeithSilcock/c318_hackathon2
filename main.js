@@ -260,7 +260,8 @@ class eventfulEventRequester {
         date = this.formatDate(date);
         let dateEnd=(Number(date) + 3).toString();
 
-        let url=`https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=${date}00-${dateEnd}00&category=${category}&category=new&image_sizes=block200,medium&page_size=${numOfEntries}&sort_order=popularity`
+        let url=`https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date=${date}00-${dateEnd}00&category=${category}&image_sizes=block200,medium&page_size=${numOfEntries}&category=new`
+
         console.log(url);
         $.ajax({
             //url: "https://api.eventful.com/json/events/search?app_key=Zb7jwSS8MQppFwhH&location=los angeles&within=15&date="+  startDate +"00-" + endDate + "00&category=" +  category + "&image_sizes=blackborder250,block100&page_size=10&category=new",
@@ -268,7 +269,7 @@ class eventfulEventRequester {
             url: url,
             dataType: 'jsonp',
             data: {},
-            success: function (rawData){ 
+            success: function (rawData){
                 console.log("eventful" , rawData);
                 for (let event = 0; event < rawData.events.event.length; event++) {
 
@@ -287,10 +288,10 @@ class eventfulEventRequester {
                         var c = a.indexOf('http');
                         if(c === 0 || b === undefined){
                             imageUrl = a;
-                
+
                         }else{
                             imageUrl = 'http:'+ b.url;
-                        }                            
+                        }
                     }
                     if (rawData.events.event[event].venue_address !== null) {
                         var venue_address = rawData.events.event[event].venue_address;
@@ -300,7 +301,6 @@ class eventfulEventRequester {
                     }
                     if (rawData.events.event[event].description !== null) {
                         var description = rawData.events.event[event].description;
-                        debugger
                     }
                     if (rawData.events.event[event].start_time !== null) {
                         var startTime = rawData.events.event[event].start_time;
@@ -337,7 +337,6 @@ class eventfulEventRequester {
                         venueZip: venueZip,
                         venueState:venueState,
                     };
-
                     eventSearchResultArray.push(eventSearchResultObject);
                 }
                 console.log("eventSearchResultArray: ", eventSearchResultArray);
@@ -470,8 +469,8 @@ class EventRenderer{
             let date= $("#eventDate").text(info.date);
             let time= $("#eventTime").text(info.eventTime);
 
-            let eventDetails = thisObj.formatInformation(info.description)
-            let infoDetails= $("#eventDetail").text(eventDetails);
+            // let eventDetails = thisObj.formatInformation(info.description)
+            let infoDetails= $("#eventDetail").html(info.description);
 
             console.log(info)
         }, 1000)
@@ -510,20 +509,20 @@ class EventRenderer{
         }
 
     }
-    formatInformation(info){
-        //check if they have HTML tags
-        // if(info.indexOf('<')) {
-        //     let eventInfo = $('<div>').html(info);
-        //     let mainInnerText = eventInfo[0].innerText;
-        //     for (let childrenHTMLIndex = 0; childrenHTMLIndex < eventInfo[0].children.length; childrenHTMLIndex++) {
-        //         mainInnerText += " " + eventInfo[0].children[childrenHTMLIndex].innerText;
-        //     }
-
-        //     return mainInnerText;
-        // }else{
-        //     return info
-        // }
-    }
+    // formatInformation(info){
+    //     // check if they have HTML tags
+    //     if(info.indexOf('<')) {
+    //         let eventInfo = $('<div>').html(info);
+    //         let mainInnerText = eventInfo[0].innerText;
+    //         for (let childrenHTMLIndex = 0; childrenHTMLIndex < eventInfo[0].children.length; childrenHTMLIndex++) {
+    //             mainInnerText += " " + eventInfo[0].children[childrenHTMLIndex].innerText;
+    //         }
+    //
+    //         return mainInnerText;
+    //     }else{
+    //         return info
+    //     }
+    // }
 
 }
 
