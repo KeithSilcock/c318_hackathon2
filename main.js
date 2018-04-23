@@ -365,7 +365,7 @@ class EventRenderer{
         });
 
         if(dataFromEventAPI.imageLargeUrl === undefined){
-            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
+            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpg'
         }
         let eventContainer = $("<div>",{
             'class':'event innerEventContainer',
@@ -701,7 +701,7 @@ class YelpDataGetter {
         let restaurantName = yelpBusiness.name;
         let restaurantPrice = yelpBusiness.price;
         let restaurantNameElement = $("<div>",{
-            'class':'restaurantName row',
+            'class':'restaurantName row restaurantInfo',
             text: `${restaurantName}, ${restaurantPrice}`,
         });
 
@@ -714,7 +714,7 @@ class YelpDataGetter {
             return categories;
         }
         let restaurantCategoriesElement = $("<div>",{
-            'class':'restaurantCategories row',
+            'class':'restaurantCategories row restaurantInfo',
             text: `${getRestaurantCategories(yelpBusiness.categories)}`,
         });
 
@@ -731,14 +731,14 @@ class YelpDataGetter {
         }
         let restaurantPhone = yelpBusiness.display_phone;
         let restaurantLocationPhoneElement = $("<div>" , {
-            'class' : 'restaurantLocationPhone row',
+            'class' : 'restaurantLocationPhone row restaurantInfo',
             text: `${getRestaurantLocation(yelpBusiness.location)}, ${restaurantPhone}`
         });
 
         let restaurantRating = yelpBusiness.rating;
         let restaurantRatingCount = yelpBusiness.review_count;
         let restaurantReviewElement = $("<div>" , {
-            'class' : 'resturantReviews row',
+            'class' : 'resturantReviews row restaurantInfo',
             text: `${restaurantRating}, Review Count: ${restaurantRatingCount}`
         });
 
