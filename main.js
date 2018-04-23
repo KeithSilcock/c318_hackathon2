@@ -524,7 +524,6 @@ class YelpDataGetter {
         this.apiDataObject = {
             access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx",
             term: "restaurants",
-            // location : "Los Angeles",
             radius : 300,
             categories: "Asian",
             priceRange : "1,2,3,4",
@@ -537,19 +536,20 @@ class YelpDataGetter {
 
         this.handleEventHandler();
 
-        this.ajaxCall();
+        this.ajaxCall(this.apiDataObject);
     }
 
     handleEventHandler(){
-        $("#yelpSearchButton").click(this.submitYelpButtonClicked.bind(this));
+        this.submitYelpButtonClicked = this.submitYelpButtonClicked.bind(this);
+        $("#yelpSearchButton").click(this.submitYelpButtonClicked);
     }
 
-    ajaxCall() {
+    ajaxCall(searchParameters) {
         var yelpAjaxCall = {
             dataType: "JSON",
             method: 'POST',
             url: "http://yelp.ongandy.com/businesses",
-            data: this.apiDataObject,
+            data: searchParameters,
             success: this.successPullBusinessData.bind(this),
             error: function (errors) {
                 ////console.log("errors : ", errors);
@@ -574,7 +574,13 @@ class YelpDataGetter {
 
     //Katy here's your work for today! GET TO WORK!
     initMap(lat,lng, yelpBusinessResultsArray) {
-        console.log(yelpBusinessResultsArray[0].coordinates.latitude)
+        console.log(yelpBusinessResultsArray[0].coordinates.latitude);
+
+        this.infoWindow = new google.maps.InfoWindow();
+
+        // clearing any previous present map.
+        $('.gm-style').remove();
+
         let mapOptions = {
             zoom: 16,
             center: new google.maps.LatLng(lat,lng)
@@ -591,27 +597,81 @@ class YelpDataGetter {
                 position: new google.maps.LatLng(markerLat, markerLng),
                 animation: google.maps.Animation.DROP,
             });
+
+            google.maps.event.addListener(marker, 'click', function(thisEvent) {
+                debugger;
+                console.log(this);
+                this.giveRestaurantData(yelpBusinessResultsArray[markerIndex]);
+                this.infoWindow.open(map, this);
+            });
+
         }
-        return map
+        return map;
     }
 
-    submitYelpButtonClicked(eventLocation, searchObjectParameters) {
+    giveRestaurantData(restaurant) {
+        console.log("marker clicked");
+        let infoWindow = new google.maps.InfoWindow();
+        var content = `
+        <div class="restaurantInformation">
+            <div class="restaurantName">
+                <h1>${restaurant.name}</h1>
+            </div>
+            <div class="price">
+                <p>${restaurant.priceRange}</p>
+            </div>
+            <div class="restaurantCategory">
+                <p>${getRestaurantCategories(restaurant.categories)}</p>
+            </div>
+            <div class="phoneNumber">
+                <p>${restaurant.display_phone}</p>
+            </div>
+            <div class="locationAddress">
+                <p>${getRestaurantLocation(restaurant.location)}</p>
+            </div>
+            <div class="rating">
+                <p>${restaurant.rating}</p>
+            </div>
+            <div class="reviewCount">
+                <p>${restaurant.review_count}</p>
+            </div>
+        </div>`;
+
+
+        function getRestaurantCategories(restaurantCategories) {
+            var categories = "";
+            for(var categoryIndex = 0; categoryIndex < restaurantCategories.length; categoryIndex++ ) {
+                categories = categories + ", " + restaurantCategories[categoryIndex].title;
+            }
+        }
+
+        function getRestaurantLocation(restaurantLocationObject) {
+            var location = `${restaurantLocationObject.address1},${restaurantLocationObject.address2},${restaurantLocationObject.address3}, ${restaurantLocationObject.city}, ${restaurantLocationObject.zip_code}`
+            return location
+        }
+
+        infoWindow.setContent(content);
+    }
+
+    submitYelpButtonClicked() {
         // var searchObj = {
         //     access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx"
         // };
-        var milesToMeters = 1609.34/1; //1609.34m per 1 mile
-        searchObjectParameters.term = $("#term").val() || this.apiDataObject.term;
-        searchObjectParameters.latitude = eventLocation.latitude || this.apiDataObject.latitude;
-        searchObjectParameters.longitude = eventLocation.longitude || this.apiDataObject.longitude;
-        searchObjectParameters.location = $(/*#location*/).val() || this.apiDataObject.location;
-        searchObjectParameters.radius = parseInt($("#radius").val())*milesToMeters || this.apiDataObject.radius;
-        searchObjectParameters.categories = $(/*#categories*/).val() || this.apiDataObject.categories;
-        searchObjectParameters.priceRange = $(/*"#priceRange"*/).val() || this.apiDataObject.price;
-        searchObjectParameters.open_now = $(/*#open_now*/).val() || this.apiDataObject.open_now;
-        searchObjectParameters.sort_by = $(/*#sort_by*/).val() || this.apiDataObject.sort_by;
+        var milesToMeters = 1609.34; //1609.34m per 1 mile
+        this.apiDataObject.term = $("#yelpSearchBoxTerm").val() || this.apiDataObject.term;
+        this.apiDataObject.location = $(/*#location*/).val() || this.apiDataObject.location;
+        this.apiDataObject.radius = Math.floor(parseFloat($("#yelpSearchBoxRadius").val())*milesToMeters) || this.apiDataObject.radius;
+        this.apiDataObject.categories = $(/*#categories*/).val() || this.apiDataObject.categories;
+        this.apiDataObject.priceRange = $(/*"#priceRange"*/).val() || this.apiDataObject.price;
+        this.apiDataObject.open_now = $(/*#open_now*/).val() || this.apiDataObject.open_now;
+        this.apiDataObject.sort_by = $(/*#sort_by*/).val() || this.apiDataObject.sort_by;
 
+        console.log(this.apiDataObject);
 
-        return searchObjectParameters;
+        this.ajaxCall(this.apiDataObject);
+
+        return this.apiDataObject;
+
         // var newYelpCall = new YelpDataGetter(eventLocation, searchObjectParameters);
         // console.log(newYelpCall);
         // var map = new CreateGoogleMap(newYelpCall.yelpBusinessResultsArray);
