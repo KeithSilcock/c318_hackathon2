@@ -517,6 +517,60 @@ class EventRenderer{
             return info
         }
     }
+
+    yelpDatatoDomElements() {
+
+    }
+
+    createYelpDOMElements(yelpBusinessArray) {
+        let yelpDataContainer = $("<div>",{
+            'class': 'yelpDataContainer'
+        });
+
+        if(dataFromEventAPI.imageLargeUrl === undefined){
+            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
+        }
+        let eventContainer = $("<div>",{
+            'class':'event innerEventContainer',
+            css:{
+                'background-image': `url("${dataFromEventAPI.imageLargeUrl}")`
+            },
+            on:{
+                // 'click': this.handlePopOutAnimation.bind(this),
+            },
+        });
+
+        let shortHandTitle = this.formatEventName(dataFromEventAPI.title)
+
+        let nameEl = $("<div>",{
+            'class':'eventName eventContent row col-xs-8 col-md-12',
+            text: shortHandTitle,
+        });
+
+        let infoTime = dataFromEventAPI.startTime.slice(11,16);
+
+        dataFromEventAPI.eventTime = this.formatTime(infoTime);
+
+        dataFromEventAPI.date = `${dataFromEventAPI.startTime.slice(5,7)}-${dataFromEventAPI.startTime.slice(8,10)}-${dataFromEventAPI.startTime.slice(0, 4)}`;
+
+        let dateEl = $("<div>",{
+            'class':'eventDate eventContent row  col-xs-8 col-md-12',
+            text: `${dataFromEventAPI.eventTime}`,
+        });
+
+
+        //closure to get added data
+        (function (eventRendererObj) {
+            eventContainer.on({
+                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, dataFromEventAPI, outerContainer)
+            })
+        })(this);
+
+        eventContainer.append(nameEl, dateEl);
+        outerContainer.append(eventContainer);
+
+        return outerContainer;
+    }
 }
 
 class YelpDataGetter {
@@ -570,6 +624,7 @@ class YelpDataGetter {
             let newMap = this.initMap(this.apiDataObject.latitude, this.apiDataObject.longitude, yelpBusinessResultsArray);
 
         }
+
     }
 
     //Katy here's your work for today! GET TO WORK!
