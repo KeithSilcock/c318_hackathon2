@@ -1,5 +1,6 @@
 $(window).on('load', function () {
     let controller = new CircleController();
+    // controller.start();
 });
 
 
@@ -55,11 +56,15 @@ class CircleController {
         $('.page1').removeClass('pageHidden');
         $('.page2').addClass('pageHidden');
         $('.page3').addClass('pageHidden');
+
+        this.clearMapData();
     }
     pageState2() {
         $('.page1').addClass('pageHidden');
         $('.page2').removeClass('pageHidden');
         $('.page3').addClass('pageHidden');
+
+        this.clearMapData();
     }
     pageState3() {
         $('.page1').addClass('pageHidden');
@@ -354,47 +359,47 @@ class EventRenderer{
         }
 
     }
-    createEventDoms(infoToParse, odd){
+    createEventDoms(dataFromEventAPI){
         let outerContainer = $("<div>",{
             'class': 'outerEventContainer col-xs-12 col-md-3'
         });
 
-        if(infoToParse.imageLargeUrl === undefined){
-            infoToParse.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
+        if(dataFromEventAPI.imageLargeUrl === undefined){
+            dataFromEventAPI.imageLargeUrl= 'includes/images/testPartyImg.jpeg'
         }
         let eventContainer = $("<div>",{
             'class':'event innerEventContainer',
             css:{
-                'background-image': `url("${infoToParse.imageLargeUrl}")`
+                'background-image': `url("${dataFromEventAPI.imageLargeUrl}")`
             },
             on:{
                 // 'click': this.handlePopOutAnimation.bind(this),
             },
         });
 
-        let shortHandTitle = this.formatEventName(infoToParse.title)
+        let shortHandTitle = this.formatEventName(dataFromEventAPI.title)
 
         let nameEl = $("<div>",{
             'class':'eventName eventContent row col-xs-8 col-md-12',
             text: shortHandTitle,
         });
 
-        let infoTime = infoToParse.startTime.slice(11,16);
+        let infoTime = dataFromEventAPI.startTime.slice(11,16);
 
-        infoToParse.eventTime = this.formatTime(infoTime);
+        dataFromEventAPI.eventTime = this.formatTime(infoTime);
 
-        infoToParse.date = `${infoToParse.startTime.slice(5,7)}-${infoToParse.startTime.slice(8,10)}-${infoToParse.startTime.slice(0, 4)}`;
+        dataFromEventAPI.date = `${dataFromEventAPI.startTime.slice(5,7)}-${dataFromEventAPI.startTime.slice(8,10)}-${dataFromEventAPI.startTime.slice(0, 4)}`;
 
         let dateEl = $("<div>",{
             'class':'eventDate eventContent row  col-xs-8 col-md-12',
-            text: `${infoToParse.eventTime}`,
+            text: `${dataFromEventAPI.eventTime}`,
         });
 
 
         //closure to get added data
         (function (eventRendererObj) {
             eventContainer.on({
-                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, infoToParse),
+                'click':eventRendererObj.openEventPageInformation.bind(this, eventRendererObj, dataFromEventAPI, outerContainer)
             })
         })(this);
 
@@ -428,29 +433,41 @@ class EventRenderer{
         $(".eventsContainer").append(domElement);
     }
 
-    openEventPageInformation(thisObj, info, event){
-        // set state to page 3
-        thisObj.setStateCallback(3);
+    openEventPageInformation(thisObj, info,domElementToAttachCircle, event){
+        // add circle animation
+        let circleGif = $("<img>",{
+            'class': 'circleGif',
+            'src': 'includes/images/noRepeatCircleSmall.gif'+"?a="+Math.random(),
+        });
+        domElementToAttachCircle.append(circleGif);
 
-        let eventCoordinates = {
-            latitude:info.latitude,
-            longitude:info.longitude,
-        };
+        //after animation, pull event data
+        setTimeout(function () {
+            // set state to page 3
+            thisObj.setStateCallback(3);
 
-        var yelpData = new YelpDataGetter(eventCoordinates,info);
+            let eventCoordinates = {
+                latitude:info.latitude,
+                longitude:info.longitude,
+            };
 
-        // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
+            var yelpData = new YelpDataGetter(eventCoordinates,info);
 
-        let image =  $("#imageArea").attr('src', info.imageLargeUrl);
-        let street= $("#eventStreet").text(info.venue_address);
-        let city= $("#eventCity").text(info.cityName);
-        let state= $("#eventState").text(info.venueState);
-        let zip= $("#eventZip").text(info.venueZip);
-        let date= $("#eventDate").text(info.date);
-        let time= $("#eventTime").text(info.eventTime);
-        let infoDetails= $("#eventDetail").text(info.description);
+            // let address = `${info.venue_address} ${info.cityName}, ${info.venueState} ${info.venueZip} `
 
-        console.log(info)
+            let image =  $("#imageArea").attr('src', info.imageLargeUrl);
+            let street= $("#eventStreet").text(info.venue_address);
+            let city= $("#eventCity").text(info.cityName);
+            let state= $("#eventState").text(info.venueState);
+            let zip= $("#eventZip").text(info.venueZip);
+            let date= $("#eventDate").text(info.date);
+            let time= $("#eventTime").text(info.eventTime);
+
+            let eventDetails = thisObj.formatInformation(info.description)
+            let infoDetails= $("#eventDetail").html(eventDetails);
+
+            console.log(info)
+        }, 1000)
     }
     formatTime(time){
         let meridiem = 'AM';
@@ -469,7 +486,6 @@ class EventRenderer{
     }
     formatEventName(name){
         //cut off title at closest space, add ... to indicate more info
-
         if(name.length > this.maxNumOfCharsPerEventTitle) {
             let lastSpaceIndex = 0;
             //find last space in string
@@ -486,6 +502,20 @@ class EventRenderer{
             return name
         }
 
+    }
+    formatInformation(info){
+        //check if they have HTML tags
+        if(info.indexOf('<')) {
+            let eventInfo = $('<div>').html(info);
+            let mainInnerText = eventInfo[0].innerText;
+            for (let childrenHTMLIndex = 0; childrenHTMLIndex < eventInfo[0].children.length; childrenHTMLIndex++) {
+                mainInnerText += " " + eventInfo[0].children[childrenHTMLIndex].innerText;
+            }
+
+            return mainInnerText;
+        }else{
+            return info
+        }
     }
 }
 
@@ -542,6 +572,7 @@ class YelpDataGetter {
         }
     }
 
+    //Katy here's your work for today! GET TO WORK!
     initMap(lat,lng, yelpBusinessResultsArray) {
         console.log(yelpBusinessResultsArray[0].coordinates.latitude);
 
