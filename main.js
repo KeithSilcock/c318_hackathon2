@@ -110,7 +110,7 @@ class CircleController {
         });
 
     }
-
+// added comment here
     handleRequestEvents() {
         //remove previous events
         $(".outerEventContainer ").remove();
