@@ -541,7 +541,7 @@ class YelpDataGetter {
 
     handleEventHandler(){
         this.submitYelpButtonClicked = this.submitYelpButtonClicked.bind(this);
-        $("#yelpSearchButton").click(this.ajaxCall(this.submitYelpButtonClicked));
+        $("#yelpSearchButton").click(this.submitYelpButtonClicked);
     }
 
     ajaxCall(searchParameters) {
@@ -653,21 +653,25 @@ class YelpDataGetter {
         infoWindow.setContent(content);
     }
 
-    submitYelpButtonClicked(searchObjectParameters) {
+    submitYelpButtonClicked() {
         // var searchObj = {
         //     access_token: "17TJfP0tFmBX3bHRcvUEDnVkR2VgnziO0jhDrwgPcrEJXjJ0H66V0H5kmMWQwTHX2cZfhynFzE3sjaEzBb-v7chrsyweKxQQIvPbbW5SvMZt01-PWWi7PPo2PEvVWnYx"
         // };
-        var milesToMeters = 1609.34/1; //1609.34m per 1 mile
-        searchObjectParameters.term = $("#term").val() || this.apiDataObject.term;
-        searchObjectParameters.location = $(/*#location*/).val() || this.apiDataObject.location;
-        searchObjectParameters.radius = parseInt($("#radius").val())*milesToMeters || this.apiDataObject.radius;
-        searchObjectParameters.categories = $(/*#categories*/).val() || this.apiDataObject.categories;
-        searchObjectParameters.priceRange = $(/*"#priceRange"*/).val() || this.apiDataObject.price;
-        searchObjectParameters.open_now = $(/*#open_now*/).val() || this.apiDataObject.open_now;
-        searchObjectParameters.sort_by = $(/*#sort_by*/).val() || this.apiDataObject.sort_by;
+        var milesToMeters = 1609.34; //1609.34m per 1 mile
+        this.apiDataObject.term = $("#yelpSearchBoxTerm").val() || this.apiDataObject.term;
+        this.apiDataObject.location = $(/*#location*/).val() || this.apiDataObject.location;
+        this.apiDataObject.radius = Math.floor(parseFloat($("#yelpSearchBoxRadius").val())*milesToMeters) || this.apiDataObject.radius;
+        this.apiDataObject.categories = $(/*#categories*/).val() || this.apiDataObject.categories;
+        this.apiDataObject.priceRange = $(/*"#priceRange"*/).val() || this.apiDataObject.price;
+        this.apiDataObject.open_now = $(/*#open_now*/).val() || this.apiDataObject.open_now;
+        this.apiDataObject.sort_by = $(/*#sort_by*/).val() || this.apiDataObject.sort_by;
 
+        console.log(this.apiDataObject);
 
-        return searchObjectParameters;
+        this.ajaxCall(this.apiDataObject);
+
+        return this.apiDataObject;
+
         // var newYelpCall = new YelpDataGetter(eventLocation, searchObjectParameters);
         // console.log(newYelpCall);
         // var map = new CreateGoogleMap(newYelpCall.yelpBusinessResultsArray);
